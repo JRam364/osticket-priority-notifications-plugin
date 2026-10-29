@@ -2,8 +2,7 @@
 class PriorityNotificationConfig extends PluginConfig {
 
     function getOptions() {
-       function getOptions()
-    {
+       
         return array(
             'enabled' => new BooleanField(array(
                 'label' => 'Enable Priority Alerts',
@@ -16,7 +15,7 @@ class PriorityNotificationConfig extends PluginConfig {
         );
     }
     }
-}
+
 
    
 
