@@ -36,16 +36,20 @@ function onPriorityIncreased($ticket, $data)
 
 
     $priority = $ticket->getPriority();
-   
+    
+    // Check for priority
     if (!$priority) {
     error_log('PriorityNotification: No priority found.');
     return;
     }
 
+    // Get priority name
     $priorityId = (int) $priority->getId();
+    $priorityName = $priority ? $priority->getDesc() : 'Unknown';
 
     error_log('PriorityNotification: Priority ID = ' . $priorityId);
 
+    // Check if new priority applies
     if ($config->get('high_emergency_only')) {
         $allowedPriorities = array(3, 4);
 
@@ -84,13 +88,19 @@ function onPriorityIncreased($ticket, $data)
                 continue;
             }
 
-            // Build subject and message of email
+            // Build a direct link to the ticket
+            $ticketUrl = rtrim($cfg->getUrl(), '/')
+                    . '/scp/tickets.php?id='
+                    . $ticket->getId();
+
             $subject = 'Ticket #' . $ticket->getNumber()
-                    . ' - Priority Increased';
+                    . ' - Priority Increased to ' . $priorityName;
 
             $message = "A ticket's priority has been increased.\n\n"
                     . "Ticket Number: " . $ticket->getNumber() . "\n"
-                    . "Subject: " . $ticket->getSubject() . "\n\n"
+                    . "Subject: " . $ticket->getSubject() . "\n"
+                    . "New Priority: " . $priorityName . "\n\n"
+                    . "View Ticket: " . $ticketUrl . "\n\n"
                     . "Please review this ticket.";
 
             $result = $email->sendAlert(
