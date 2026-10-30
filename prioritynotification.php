@@ -31,30 +31,6 @@ function onPriorityIncreased($ticket, $data)
         return;
     }
 
-    // Check team members that could get the alert
-    // $team = $ticket->getTeam();
-
-    // if ($team) {
-    //         error_log('Assigned team: ' . $team->getName());
-
-    //         foreach ($team->getMembers() as $staff) {
-    //             if ($staff) {
-    //                 error_log(
-    //                     'Team member: '
-    //                     . $staff->getName()
-    //                     . ' <'
-    //                     . $staff->getEmail()
-    //                     . '>'
-    //                 );
-    //             }
-    //         }
-    //     }
-    // else {
-    //     error_log('PriorityNotification: No assigned team.');
-    //     }
-
-     
-
     // Get the configured alert email
     $email = $cfg->getAlertEmail();
 
@@ -63,32 +39,51 @@ function onPriorityIncreased($ticket, $data)
         return;
     }
 
-    // Hardcode email address as the only recepient
-    $recipient = 'testemail';
+    // Get team for ticket
+    $team = $ticket->getTeam();
 
-    $subject = '[DEV TEST] Ticket #' .
-        $ticket->getNumber() .
-        ' - Priority Increased';
+    // Loop through team members
+    if ($team) {
+        foreach ($team->getMembers() as $staff) {
 
-    $message = "A ticket's priority has been increased.\n\n"
-        . "Ticket Number: " . $ticket->getNumber() . "\n"
-        . "Subject: " . $ticket->getSubject() . "\n\n"
-        . "This is a test notification from development.";
+            // Make sure they are active
+            if (!$staff || !$staff->isActive()) {
+                continue;
+            }
 
-    // Send exactly one email per callback execution
-    $result = $email->sendAlert(
-        $recipient,
-        $subject,
-        $message,
-        null,
-        array('text' => true)
-    );
+            // Get their email
+            $recipient = $staff->getEmail();
 
-    error_log(
-        $result
-            ? 'PriorityNotification: Test email submitted.'
-            : 'PriorityNotification: Test email failed.'
-    );
+            if (!$recipient) {
+                continue;
+            }
+
+            // Build subject and message of email
+            $subject = 'Ticket #' . $ticket->getNumber()
+                    . ' - Priority Increased';
+
+            $message = "A ticket's priority has been increased.\n\n"
+                    . "Ticket Number: " . $ticket->getNumber() . "\n"
+                    . "Subject: " . $ticket->getSubject() . "\n\n"
+                    . "Please review this ticket.";
+
+            $result = $email->sendAlert(
+                $recipient,
+                $subject,
+                $message,
+                null,
+                array('text' => true)
+            );
+
+            if ($result) {
+                error_log('PriorityNotification: Email sent to ' . $recipient);
+            } else {
+                error_log('PriorityNotification: Failed to send to ' . $recipient);
+            }
+        }
+    }
+    
+
 
 }
 }
