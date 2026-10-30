@@ -16,7 +16,7 @@ class PriorityNotificationPlugin extends Plugin
         array($this, 'onPriorityIncreased')
     );
 
-    error_log("PriorityNotification: Signal listener registered");
+
 }
 
 function onPriorityIncreased($ticket, $data)
@@ -30,6 +30,34 @@ function onPriorityIncreased($ticket, $data)
         error_log("PriorityNotification: Invalid ticket object.");
         return;
     }
+
+    $config = $this->getConfig();
+
+    if (!$config->get('enabled')) {
+        return;
+    }
+
+    $priority = $ticket->getPriority();
+   
+    if (!$priority) {
+    error_log('PriorityNotification: No priority found.');
+    return;
+    }
+
+    $priorityId = (int) $priority->getId();
+
+    error_log('PriorityNotification: Priority ID = ' . $priorityId);
+
+    if ($config->get('high_emergency_only')) {
+        $allowedPriorities = array(3, 4);
+
+        if (!in_array($priorityId, $allowedPriorities, true)) {
+            error_log('PriorityNotification: Priority not eligible for notification.');
+            return;
+        }
+    }
+
+    error_log('PriorityNotification: Priority check passed.');
 
     // Get the configured alert email
     $email = $cfg->getAlertEmail();
