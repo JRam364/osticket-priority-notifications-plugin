@@ -32,10 +32,8 @@ function onPriorityIncreased($ticket, $data)
     }
 
     $config = $this->getConfig();
+   
 
-    if (!$config->get('enabled')) {
-        return;
-    }
 
     $priority = $ticket->getPriority();
    
