@@ -114,6 +114,23 @@ function onPriorityIncreased($ticket, $data = null)
     // Get team for ticket
     $team = $ticket->getTeam();
 
+    // Get logo from images folder
+    $logoPath = __DIR__ . '/images/ost-logo.png';
+
+    $logoHtml = '';
+
+    // Check if image exists, and is readable
+    if (is_readable($logoPath)) {
+        // Convert PNG to Base64
+        $logoData = base64_encode(file_get_contents($logoPath));
+
+        // Build HTML image element
+        $logoHtml = '<img src="data:image/png;base64,' . $logoData . '"
+                        alt="Logo"
+                        width="180"
+                        style="display:block; margin-bottom:20px;">';
+    }
+
     // Loop through team members
     if ($team) {
         foreach ($team->getMembers() as $staff) {
@@ -141,7 +158,13 @@ function onPriorityIncreased($ticket, $data = null)
 
             // Use HTML in email message
             $message = '
+            
                 <div style="font-family: Arial, sans-serif; font-size: 16px;">
+
+                     <div style="font-family: Arial, sans-serif; font-size: 16px;">
+
+                    ' . $logoHtml . '
+
 
                     <h2 style="font-size: 22px;">
                         Ticket Priority Increased
