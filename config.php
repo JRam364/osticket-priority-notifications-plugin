@@ -1,19 +1,18 @@
 <?php
-class PriorityNotificationConfig extends PluginConfig {
-
-    function getOptions() {
-       
+class PriorityNotificationConfig extends PluginConfig
+{   
+    
+    function getOptions()
+    {
+        // Add option for only notifying of high priority increases
         return array(
-            
-                
-            // Add option for only notifying of high priority increases
             'high_emergency_only' => new BooleanField(array(
-                    'label' => 'High and Emergency Only',
-                    'default' => true,
-                    'configuration' => array(
-                        'desc' => 'Only send notifications when the new priority is High or Emergency.'
-                    )
-                ))
-            );
-        }
+                'label' => 'High and Emergency Only',
+                'default' => false,
+                'configuration' => array(
+                    'desc' => 'Only send emails when priority increases to High or Emergency.'
+                )
+            ))
+        );
+    }
 }

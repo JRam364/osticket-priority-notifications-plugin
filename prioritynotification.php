@@ -9,63 +9,98 @@ class PriorityNotificationPlugin extends Plugin
 {
     var $config_class = 'PriorityNotificationConfig';
 
+    // Create configuration property
+    private $notificationConfig = null;
+
     function bootstrap()
 {
-    // Connect to signal that detects a new priority that is 
-    // higher than the previous
+    // Retrieve each instance associated with plugin
+    foreach ($this->getInstances() as $instance) {
+
+        // Retrieve configuration object associated with the particular plugin instance
+        $this->notificationConfig = $instance->getConfig();
+                // Log the checkbox value
+                error_log(
+                    'PriorityNotification: High/Emergency Only = ' .
+                    var_export(
+                        $this->notificationConfig->get('high_emergency_only'),
+                        true
+                    )
+                );
+        break;
+    }
+
+    // Check whether the configuration was found
+    if (!$this->notificationConfig) {
+        error_log('PriorityNotification: No plugin configuration found.');
+        return;
+    }
+
+    // Register signal
     Signal::connect(
         'ticket.priority.increased',
         array($this, 'onPriorityIncreased')
     );
-
-
 }
 
-function onPriorityIncreased($ticket, $data)
+function onPriorityIncreased($ticket, $data = null)
 {
     global $cfg;
 
-    error_log("PriorityNotification: Priority increase detected");
+    error_log('PriorityNotification: Priority increase detected');
 
-    // Verify that this is a valid ticket object
+    // Verify ticket object
     if (!($ticket instanceof Ticket)) {
-        error_log("PriorityNotification: Invalid ticket object.");
+        error_log('PriorityNotification: Invalid ticket object.');
         return;
     }
 
-    $config = $this->getConfig();
-   
-    $priority = $ticket->getPriority();
-    
-    // Check for priority
-    if (!$priority) {
-    error_log('PriorityNotification: No priority found.');
-    return;
+    // Get configuration from the active plugin instance
+    $config = $this->notificationConfig;
+
+    if (!$config) {
+        error_log('PriorityNotification: Configuration unavailable.');
+        return;
     }
 
-    // Get priority name
+    // Retrieve the new priority
+    $priority = $ticket->getPriority();
+
+    if (!$priority) {
+        error_log('PriorityNotification: Ticket has no priority.');
+        return;
+    }
+
     $priorityId = (int) $priority->getId();
-    $priorityName = $priority ? $priority->getDesc() : 'Unknown';
+    $priorityName = $priority->getDesc();
 
-    // Get owner of the ticket
-    $owner = $ticket->getOwner();
-    $createdBy = $owner ? $owner->getName() : 'Unknown';
-
-    // Show the priority number from database
     error_log('PriorityNotification: Priority ID = ' . $priorityId);
 
-    // Check if new priority applies
-    if ($config->get('high_emergency_only')) {
+    // Retrieve checkbox setting
+    $highEmergencyOnly = $config->get('high_emergency_only');
+
+    error_log(
+        'PriorityNotification: High/Emergency Only = ' .
+        var_export($highEmergencyOnly, true)
+    );
+
+    // Apply restriction only when checkbox is checked
+    if ($highEmergencyOnly) {
         $allowedPriorities = array(3, 4);
 
         if (!in_array($priorityId, $allowedPriorities, true)) {
-            error_log('PriorityNotification: Priority not eligible for notification.');
+            error_log(
+                'PriorityNotification: Priority not eligible for notification.'
+            );
             return;
         }
     }
 
-    // Show that new priority will allow email
     error_log('PriorityNotification: Priority check passed.');
+
+    // Get ticket owner
+    $owner = $ticket->getOwner();
+    $createdBy = $owner ? $owner->getName() : 'Unknown';
 
     // Get the configured alert email
     $email = $cfg->getAlertEmail();
