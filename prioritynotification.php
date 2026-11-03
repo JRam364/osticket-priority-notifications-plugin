@@ -47,6 +47,11 @@ function onPriorityIncreased($ticket, $data)
     $priorityId = (int) $priority->getId();
     $priorityName = $priority ? $priority->getDesc() : 'Unknown';
 
+    // Get owner of the ticket
+    $owner = $ticket->getOwner();
+    $createdBy = $owner ? $owner->getName() : 'Unknown';
+
+    // Show the priority number from database
     error_log('PriorityNotification: Priority ID = ' . $priorityId);
 
     // Check if new priority applies
@@ -59,11 +64,13 @@ function onPriorityIncreased($ticket, $data)
         }
     }
 
+    // Show that new priority will allow email
     error_log('PriorityNotification: Priority check passed.');
 
     // Get the configured alert email
     $email = $cfg->getAlertEmail();
 
+    // Double check email exists
     if (!$email) {
         error_log('PriorityNotification: No email account available.');
         return;
@@ -99,6 +106,7 @@ function onPriorityIncreased($ticket, $data)
             $message = "A ticket's priority has been increased.\n\n"
                     . "Ticket Number: " . $ticket->getNumber() . "\n"
                     . "Subject: " . $ticket->getSubject() . "\n"
+                    . "Created By: " . $createdBy . "\n"
                     . "New Priority: " . $priorityName . "\n\n"
                     . "View Ticket: " . $ticketUrl . "\n\n"
                     . "Please review this ticket.";
