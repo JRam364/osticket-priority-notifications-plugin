@@ -11,6 +11,8 @@ class PriorityNotificationPlugin extends Plugin
 
     function bootstrap()
 {
+    // Connect to signal that detects a new priority that is 
+    // higher than the previous
     Signal::connect(
         'ticket.priority.increased',
         array($this, 'onPriorityIncreased')
@@ -33,8 +35,6 @@ function onPriorityIncreased($ticket, $data)
 
     $config = $this->getConfig();
    
-
-
     $priority = $ticket->getPriority();
     
     // Check for priority
@@ -100,23 +100,45 @@ function onPriorityIncreased($ticket, $data)
                     . '/scp/tickets.php?id='
                     . $ticket->getId();
 
+            // Include new priority in subject
             $subject = 'Ticket #' . $ticket->getNumber()
                     . ' - Priority Increased to ' . $priorityName;
 
-            $message = "A ticket's priority has been increased.\n\n"
-                    . "Ticket Number: " . $ticket->getNumber() . "\n"
-                    . "Subject: " . $ticket->getSubject() . "\n"
-                    . "Created By: " . $createdBy . "\n"
-                    . "New Priority: " . $priorityName . "\n\n"
-                    . "View Ticket: " . $ticketUrl . "\n\n"
-                    . "Please review this ticket.";
+            // Use HTML in email message
+            $message = '
+                <div style="font-family: Arial, sans-serif; font-size: 16px;">
 
+                    <h2 style="font-size: 22px;">
+                        Ticket Priority Increased
+                    </h2>
+
+                    <p><strong>Ticket Number:</strong> ' . htmlspecialchars($ticket->getNumber(), ENT_QUOTES, 'UTF-8') . '</p>
+
+                    <p><strong>Subject:</strong> ' . htmlspecialchars($ticket->getSubject(), ENT_QUOTES, 'UTF-8') . '</p>
+
+                    <p><strong>Created By:</strong> ' . htmlspecialchars($createdBy, ENT_QUOTES, 'UTF-8') . '</p>
+
+                    <p><strong>New Priority:</strong>
+                        <strong style="font-size: 18px;">' . htmlspecialchars($priorityName, ENT_QUOTES, 'UTF-8') . '</strong>
+                    </p>
+
+                    <p>
+                        <a href="' . htmlspecialchars($ticketUrl, ENT_QUOTES, 'UTF-8') . '">
+                            View Ticket
+                        </a>
+                    </p>
+
+                    <p>Please review this ticket.</p>
+                </div>
+            ';
+
+            // Tell oTicket to send message as HTML rather than plain text
             $result = $email->sendAlert(
                 $recipient,
                 $subject,
                 $message,
                 null,
-                array('text' => true)
+                array('text' => false)
             );
 
             if ($result) {
@@ -126,8 +148,6 @@ function onPriorityIncreased($ticket, $data)
             }
         }
     }
-    
-
 
 }
 }
