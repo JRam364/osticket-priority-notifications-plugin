@@ -19,20 +19,11 @@ class PriorityNotificationPlugin extends Plugin
 
         // Retrieve configuration object associated with the particular plugin instance
         $this->notificationConfig = $instance->getConfig();
-                // Log the checkbox value
-                error_log(
-                    'PriorityNotification: High/Emergency Only = ' .
-                    var_export(
-                        $this->notificationConfig->get('high_emergency_only'),
-                        true
-                    )
-                );
         break;
     }
 
     // Check whether the configuration was found
     if (!$this->notificationConfig) {
-        error_log('PriorityNotification: No plugin configuration found.');
         return;
     }
 
@@ -47,11 +38,11 @@ function onPriorityIncreased($ticket, $data = null)
 {
     global $cfg;
 
-    error_log('PriorityNotification: Priority increase detected');
+    //error_log('PriorityNotification: Priority increase detected');
 
     // Verify ticket object
     if (!($ticket instanceof Ticket)) {
-        error_log('PriorityNotification: Invalid ticket object.');
+        //error_log('PriorityNotification: Invalid ticket object.');
         return;
     }
 
@@ -59,7 +50,7 @@ function onPriorityIncreased($ticket, $data = null)
     $config = $this->notificationConfig;
 
     if (!$config) {
-        error_log('PriorityNotification: Configuration unavailable.');
+        //error_log('PriorityNotification: Configuration unavailable.');
         return;
     }
 
@@ -67,36 +58,36 @@ function onPriorityIncreased($ticket, $data = null)
     $priority = $ticket->getPriority();
 
     if (!$priority) {
-        error_log('PriorityNotification: Ticket has no priority.');
+        //error_log('PriorityNotification: Ticket has no priority.');
         return;
     }
 
     $priorityId = (int) $priority->getId();
     $priorityName = $priority->getDesc();
 
-    error_log('PriorityNotification: Priority ID = ' . $priorityId);
+    //error_log('PriorityNotification: Priority ID = ' . $priorityId);
 
     // Retrieve checkbox setting
     $highEmergencyOnly = $config->get('high_emergency_only');
 
-    error_log(
-        'PriorityNotification: High/Emergency Only = ' .
-        var_export($highEmergencyOnly, true)
-    );
+    // error_log(
+    //     'PriorityNotification: High/Emergency Only = ' .
+    //     var_export($highEmergencyOnly, true)
+    // );
 
     // Apply restriction only when checkbox is checked
     if ($highEmergencyOnly) {
         $allowedPriorities = array(3, 4);
 
         if (!in_array($priorityId, $allowedPriorities, true)) {
-            error_log(
-                'PriorityNotification: Priority not eligible for notification.'
-            );
+            // error_log(
+            //     'PriorityNotification: Priority not eligible for notification.'
+            // );
             return;
         }
     }
 
-    error_log('PriorityNotification: Priority check passed.');
+    //error_log('PriorityNotification: Priority check passed.');
 
     // Get ticket owner
     $owner = $ticket->getOwner();
@@ -107,7 +98,7 @@ function onPriorityIncreased($ticket, $data = null)
 
     // Double check email exists
     if (!$email) {
-        error_log('PriorityNotification: No email account available.');
+        //error_log('PriorityNotification: No email account available.');
         return;
     }
 
@@ -158,7 +149,7 @@ function onPriorityIncreased($ticket, $data = null)
 
             // Use HTML in email message
             $message = '
-            
+
                 <div style="font-family: Arial, sans-serif; font-size: 16px;">
 
                      <div style="font-family: Arial, sans-serif; font-size: 16px;">
