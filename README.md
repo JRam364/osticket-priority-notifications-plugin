@@ -15,6 +15,8 @@ The Priority Notification Plugin solves this problem by automatically sending em
     <li>Includes the ticket number, subject, requester, new priority, and ticket link.</li>
     <li>Uses formatted HTML email notifications.</li>
 </ul>
+<p>Shown below is an example of an email that is sent to team members when a priority is increased:</p>
+<img width="402" height="375" alt="image" src="https://github.com/user-attachments/assets/aad1e4c5-da78-49c9-9859-76775f1fa741" />
 
 <h3>Configuration</h3>
 <p>
@@ -23,6 +25,7 @@ The Priority Notification Plugin solves this problem by automatically sending em
     priority is High or Emergency. When disabled, notifications
     are sent for all priority increases.
 </p>
+<img width="1207" height="194" alt="image" src="https://github.com/user-attachments/assets/9739f9d9-be54-4e8d-a59c-5d57c46392e7" />
 
 <h3>Requirements</h3>
 <ul>
