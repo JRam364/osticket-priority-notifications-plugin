@@ -1,9 +1,9 @@
 <?php
 
-require_once INCLUDE_DIR . 'class.plugin.php';
+require_once (INCLUDE_DIR . 'class.plugin.php');
 require_once(INCLUDE_DIR . 'class.signal.php');
-require_once INCLUDE_DIR . 'class.email.php';
-require_once __DIR__ . '/config.php';
+require_once (INCLUDE_DIR . 'class.email.php');
+require_once (__DIR__ . '/config.php');
 
 class PriorityNotificationPlugin extends Plugin
 {
