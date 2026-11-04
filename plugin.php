@@ -2,7 +2,7 @@
 
 return array(
     'id' => 'josh:prioritynotification',
-    'version' => '0.1',
+    'version' => '1.0',
     'name' => 'Priority Notification',
     'author' => 'Josh',
     'description' => 'Notify agents when ticket priority increases.',
