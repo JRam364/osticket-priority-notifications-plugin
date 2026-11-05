@@ -47,7 +47,7 @@ function onPriorityIncreased($ticket)
     $config = $this->notificationConfig;
 
     // Retrieve custom config message
-    $customMessage = trim((string) $config->get('custom_message'));
+    $customMessage = trim(strip_tags((string) $config->get('custom_message')));
 
     if ($customMessage === '') {
         $customMessage = 'Please review this ticket.';
