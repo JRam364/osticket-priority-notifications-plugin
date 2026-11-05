@@ -12,7 +12,18 @@ class PriorityNotificationConfig extends PluginConfig
                 'configuration' => array(
                     'desc' => 'Only send emails when priority increases to High or Emergency.'
                 )
-            ))
+            )),
+            // Add textbox for custom message
+            'custom_message' => new TextareaField(array(
+                'label' => 'Custom Email Message',
+                'hint' => 'Message displayed at the bottom of priority notification emails.',
+                'default' => 'Please review this ticket.',
+                'required' => false,
+                'configuration' => array(
+                    'rows' => 5,
+                    'cols' => 60,
+                ),
+            )),
         );
     }
 }

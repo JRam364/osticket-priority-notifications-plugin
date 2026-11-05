@@ -46,6 +46,13 @@ function onPriorityIncreased($ticket)
     // Get configuration from the active plugin instance
     $config = $this->notificationConfig;
 
+    // Retrieve custom config message
+    $customMessage = trim((string) $config->get('custom_message'));
+
+    if ($customMessage === '') {
+        $customMessage = 'Please review this ticket.';
+    }
+
     if (!$config) {
         return;
     }
@@ -162,7 +169,7 @@ function onPriorityIncreased($ticket)
                         </a>
                     </p>
 
-                    <p>Please review this ticket.</p>
+                    <p>' . nl2br(htmlspecialchars($customMessage, ENT_QUOTES, 'UTF-8')) . '</p>
                 </div>
             ';
 
